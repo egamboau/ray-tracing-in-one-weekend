@@ -1,5 +1,7 @@
 package com.egamboau;
 
+import com.egamboau.utils.ColorVector;
+
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -34,15 +36,19 @@ public class App extends Application {
 
     private void drawImage(){
         PixelWriter pixelWriter = gc.getPixelWriter();
-
         for (int j = 0; j < imageHeigt; ++j) {
+
+            System.err.println(String.format("\rScanlines remaining: %d", imageHeigt - j));
             for (int i = 0; i < imageWidth; ++i) {
                double r = (double)i / (imageWidth-1);
                double g = (double) j / (imageHeigt-1);
                double b = 0;
 
-               Color currentColor = new Color(r, g, b, 1);
+               ColorVector colorVector = new ColorVector(r,g,b);
+               Color currentColor = ColorVector.generateColor(colorVector);
+
                pixelWriter.setColor(i,j,currentColor);
+               System.err.println(String.format("r=%f g=%f b=%f", r,g,b));
             }
             
         }
