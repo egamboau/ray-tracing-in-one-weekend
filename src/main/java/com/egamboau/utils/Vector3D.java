@@ -53,9 +53,9 @@ public class Vector3D {
 
     public Vector3D multiplyVectorByScalar(double scalar) {
         return new Vector3D(
-                this.vector[0] + scalar,
-                this.vector[1] + scalar,
-                this.vector[2] + scalar);
+                this.vector[0] * scalar,
+                this.vector[1] * scalar,
+                this.vector[2] * scalar);
     }
 
     public Vector3D divideVectorByScalar(double scalar) {
