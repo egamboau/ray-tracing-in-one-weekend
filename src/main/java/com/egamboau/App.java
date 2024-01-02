@@ -89,12 +89,26 @@ public class App extends Application {
     }
 
     private ColorVector getRayColor(Ray ray) {
+        if (this.rayHitSphere(new Vector3D(0,0,10), 0.5, ray)) {
+            return new ColorVector(1, 0, 0);
+        }
         Vector3D unitVector = ray.getDirection().getUnitVector();
         double a = 0.5*(unitVector.getY()+ 1.0) ;
         ColorVector whiteValue = new ColorVector(1,1,1).multiplyVectorByScalar(1.0-a);
         ColorVector blueValue = new ColorVector(0.5,0.7,1).multiplyVectorByScalar(a);
 
         return whiteValue.addVector(blueValue);
+    }
+
+
+    private boolean rayHitSphere(Vector3D center, double radius, Ray ray) {
+        Vector3D oc = ray.getOrigin().substractVector(center);
+        double a = ray.getDirection().dotProduct(ray.getDirection());
+        double b = 2.0 * oc.dotProduct(ray.getDirection());
+        double c = oc.dotProduct(oc) - (radius * radius);
+        double discriminant = b*b - 4*a*c;
+        return discriminant >= 0;
+
     }
 
     public static void main(String[] args) {
