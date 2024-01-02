@@ -1,5 +1,9 @@
 package com.egamboau;
 
+import com.egamboau.objects.HitRecord;
+import com.egamboau.objects.Hittable;
+import com.egamboau.objects.HittableList;
+import com.egamboau.objects.Sphere;
 import com.egamboau.utils.ColorVector;
 import com.egamboau.utils.Ray;
 import com.egamboau.utils.Vector3D;
@@ -32,6 +36,10 @@ public class App extends Application {
         imageHeigth = (int) (imageWidth / ASPECT_RATIO);
         imageHeigth = (imageHeigth < 1) ? 1 : imageHeigth;
 
+        HittableList world = new HittableList();
+        world.add(new Sphere(new Vector3D(0,0,-1), 0.5));
+        world.add(new Sphere(new Vector3D(0,-100.5,-1), 100));
+
         double focal_length = 1.0;
         double viewportHeight = 2.0;
         double viewportWidth = viewportHeight * ((double) imageWidth / imageHeigth);
@@ -63,10 +71,10 @@ public class App extends Application {
         primaryStage.setScene(new Scene(root, imageWidth, imageHeigth));
         primaryStage.show();
 
-        drawImage(originLocation, pixelDeltaU, pixelDeltaV, cameraCenter);
+        drawImage(originLocation, pixelDeltaU, pixelDeltaV, cameraCenter, world);
     }
 
-    private void drawImage(Vector3D originLocation, Vector3D pixelDeltaU, Vector3D pixelDeltaV, Vector3D cameraCenter) {
+    private void drawImage(Vector3D originLocation, Vector3D pixelDeltaU, Vector3D pixelDeltaV, Vector3D cameraCenter, Hittable world) {
         PixelWriter pixelWriter = gc.getPixelWriter();
         for (int j = 0; j < imageHeigth; ++j) {
 
@@ -79,7 +87,7 @@ public class App extends Application {
                 Vector3D rayDirection = pixelCenter.substractVector(cameraCenter);
                 Ray ray = new Ray(cameraCenter, rayDirection);
 
-                ColorVector pixelColor = getRayColor(ray);
+                ColorVector pixelColor = getRayColor(ray, world);
                 Color currentColor = ColorVector.generateColor(pixelColor);
 
                 pixelWriter.setColor(i, j, currentColor);
@@ -88,11 +96,12 @@ public class App extends Application {
         }
     }
 
-    private ColorVector getRayColor(Ray ray) {
-        double t = this.rayHitSphere(new Vector3D(0,0,-1), 0.5, ray);
-        if (t > 0) {
-            Vector3D N = ray.movePointToPositionInRay(t).substractVector(new Vector3D(0,0,-1)).getUnitVector();
-            return new ColorVector(N.getX()+1, N.getY()+1, N.getZ()+1).multiplyVectorByScalar(0.5);
+    private ColorVector getRayColor(Ray ray, Hittable world) {
+        HitRecord record = new HitRecord();
+
+        if (world.hit(ray, 0, Double.POSITIVE_INFINITY, record)) {
+            Vector3D result =(record.getNormal().addVector(new ColorVector(1,1,1))).multiplyVectorByScalar(0.5);
+            return new ColorVector(result.getX(), result.getY(), result.getZ());
         }
         
         Vector3D unitVector = ray.getDirection().getUnitVector();
@@ -101,21 +110,6 @@ public class App extends Application {
         ColorVector blueValue = new ColorVector(0.5,0.7,1).multiplyVectorByScalar(a);
 
         return whiteValue.addVector(blueValue);
-    }
-
-
-    private double rayHitSphere(Vector3D center, double radius, Ray ray) {
-        Vector3D oc = ray.getOrigin().substractVector(center);
-        double a = ray.getDirection().getLengthSquared();
-        double halfB = oc.dotProduct(ray.getDirection());
-        double c = oc.getLengthSquared() - (radius * radius);
-        double discriminant = halfB*halfB - a*c;
-        if(discriminant < 0 ) {
-            return -1;
-        } else {
-            return (-halfB - Math.sqrt(discriminant))/(a);
-        }
-
     }
 
     public static void main(String[] args) {

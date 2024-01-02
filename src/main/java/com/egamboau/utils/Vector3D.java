@@ -97,4 +97,8 @@ public class Vector3D {
     public String toString() {
         return String.format("%f %f %f", this.vector[0], this.vector[1], this.vector[2]);
     }
+
+    public Vector3D getNegatedVector() {
+        return new Vector3D(-getX(), -getY(), -getZ());
+    }
 }
