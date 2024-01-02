@@ -23,7 +23,7 @@ public class Ray {
         this.direction = direction;
     }
 
-    Vector3D movePointToPositionInRay(double newPosition) {
+    public Vector3D movePointToPositionInRay(double newPosition) {
         return this.origin.addVector(direction.multiplyVectorByScalar(newPosition));
     }
 

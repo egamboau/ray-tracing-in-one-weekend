@@ -89,9 +89,12 @@ public class App extends Application {
     }
 
     private ColorVector getRayColor(Ray ray) {
-        if (this.rayHitSphere(new Vector3D(0,0,10), 0.5, ray)) {
-            return new ColorVector(1, 0, 0);
+        double t = this.rayHitSphere(new Vector3D(0,0,-1), 0.5, ray);
+        if (t > 0) {
+            Vector3D N = ray.movePointToPositionInRay(t).substractVector(new Vector3D(0,0,-1)).getUnitVector();
+            return new ColorVector(N.getX()+1, N.getY()+1, N.getZ()+1).multiplyVectorByScalar(0.5);
         }
+        
         Vector3D unitVector = ray.getDirection().getUnitVector();
         double a = 0.5*(unitVector.getY()+ 1.0) ;
         ColorVector whiteValue = new ColorVector(1,1,1).multiplyVectorByScalar(1.0-a);
@@ -101,13 +104,17 @@ public class App extends Application {
     }
 
 
-    private boolean rayHitSphere(Vector3D center, double radius, Ray ray) {
+    private double rayHitSphere(Vector3D center, double radius, Ray ray) {
         Vector3D oc = ray.getOrigin().substractVector(center);
-        double a = ray.getDirection().dotProduct(ray.getDirection());
-        double b = 2.0 * oc.dotProduct(ray.getDirection());
-        double c = oc.dotProduct(oc) - (radius * radius);
-        double discriminant = b*b - 4*a*c;
-        return discriminant >= 0;
+        double a = ray.getDirection().getLengthSquared();
+        double halfB = oc.dotProduct(ray.getDirection());
+        double c = oc.getLengthSquared() - (radius * radius);
+        double discriminant = halfB*halfB - a*c;
+        if(discriminant < 0 ) {
+            return -1;
+        } else {
+            return (-halfB - Math.sqrt(discriminant))/(a);
+        }
 
     }
 
