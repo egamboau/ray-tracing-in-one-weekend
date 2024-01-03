@@ -3,6 +3,7 @@ package com.egamboau.objects;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.egamboau.utils.Interval;
 import com.egamboau.utils.Ray;
 
 public class HittableList extends Hittable{
@@ -27,13 +28,13 @@ public class HittableList extends Hittable{
     }
 
     @Override
-    public boolean hit(Ray r, double rayTMin, double rayTMax, HitRecord record) {
+    public boolean hit(Ray r, Interval rayT, HitRecord record) {
         HitRecord temporal = new HitRecord();
         boolean hitAnything = false;
-        double closest = rayTMax;
+        double closest = rayT.getMax();
 
         for (Hittable object: this.objects) {
-            if(object.hit(r,rayTMin,closest,temporal)) {
+            if(object.hit(r,new Interval(rayT.getMin(), closest),temporal)) {
                 hitAnything = true;
                 closest = temporal.getT();
                 record.setFrontFace(temporal.isFrontFace());

@@ -5,6 +5,7 @@ import com.egamboau.objects.Hittable;
 import com.egamboau.objects.HittableList;
 import com.egamboau.objects.Sphere;
 import com.egamboau.utils.ColorVector;
+import com.egamboau.utils.Interval;
 import com.egamboau.utils.Ray;
 import com.egamboau.utils.Vector3D;
 
@@ -99,7 +100,7 @@ public class App extends Application {
     private ColorVector getRayColor(Ray ray, Hittable world) {
         HitRecord record = new HitRecord();
 
-        if (world.hit(ray, 0, Double.POSITIVE_INFINITY, record)) {
+        if (world.hit(ray, new Interval(0, Double.POSITIVE_INFINITY), record)) {
             Vector3D result =(record.getNormal().addVector(new ColorVector(1,1,1))).multiplyVectorByScalar(0.5);
             return new ColorVector(result.getX(), result.getY(), result.getZ());
         }

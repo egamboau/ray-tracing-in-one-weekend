@@ -1,5 +1,6 @@
 package com.egamboau.objects;
 
+import com.egamboau.utils.Interval;
 import com.egamboau.utils.Ray;
 import com.egamboau.utils.Vector3D;
 
@@ -14,7 +15,7 @@ public class Sphere extends Hittable{
     }
 
     @Override
-    public boolean hit(Ray ray, double rayTMin, double rayTMax, HitRecord record) {
+    public boolean hit(Ray ray, Interval rayT, HitRecord record) {
         Vector3D oc = ray.getOrigin().substractVector(center);
         double a = ray.getDirection().getLengthSquared();
         double halfB = oc.dotProduct(ray.getDirection());
@@ -29,9 +30,9 @@ public class Sphere extends Hittable{
         // Find the nearest root that lies in the acceptable range.
         double root = (-halfB - discriminantSqrtd) / a;
 
-        if (root <= rayTMin || rayTMax <= root) {
+        if (!rayT.surrounds(root)) {
             root = (-halfB + discriminantSqrtd) / a;
-            if (root <= rayTMin || rayTMax <= root)
+            if (!rayT.surrounds(root))
                 return false;
         }
 
