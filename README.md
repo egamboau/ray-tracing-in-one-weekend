@@ -7,6 +7,10 @@ The book can be read online, for free, in the following [here](https://raytracin
 
 The code implementation will try to be very similar to the one in the book, however, a couple of things will be changed:
 1. The rendered image will be shown in a canvas, instead of a PPM file. The image will not be printed as a file, like in the book.
+2. Sometimes, the book references to zooming in and out the generated images. As this program will not write any file, a zoom feature was implemented:
+
+    1. Use the plus and minus keys on your keyword to zoom in and out.
+    2. Use the arrows to scroll the images if the image is zoomed in. 
 
 How this repo will be structured
 --------------------------------
