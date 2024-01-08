@@ -5,9 +5,8 @@ import com.egamboau.objects.Hittable;
 import com.egamboau.utils.ColorVector;
 import com.egamboau.utils.Interval;
 import com.egamboau.utils.Ray;
+import com.egamboau.utils.UtilitiesFunctions;
 import com.egamboau.utils.Vector3D;
-
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 
@@ -15,6 +14,7 @@ public class Camera {
 
     private double aspectRatio = 1.0D;
     private int imageWidth = 100;
+    private int samplesPerPixel = 10;
     private int imageHeigth;
 
     private Vector3D originLocation;
@@ -23,29 +23,51 @@ public class Camera {
 
     private Vector3D cameraCenter;
 
-    public void render(Hittable world, GraphicsContext gc) {
+    public void render(Hittable world, PixelWriter pixelWriter) {
         initialize();
-
-        PixelWriter pixelWriter = gc.getPixelWriter();
         for (int j = 0; j < imageHeigth; ++j) {
 
             System.err.println(String.format("\rScanlines remaining: %d", imageHeigth - j));
             for (int i = 0; i < imageWidth; ++i) {
-                Vector3D deltaUPosition = pixelDeltaU.multiplyVectorByScalar(i);
-                Vector3D deltaVPosition = pixelDeltaV.multiplyVectorByScalar(j);
-                Vector3D pixelCenter = originLocation.addVector(deltaUPosition).addVector(deltaVPosition);
+                ColorVector pixelColor = new ColorVector(0,0,0);
 
-                Vector3D rayDirection = pixelCenter.substractVector(cameraCenter);
-                Ray ray = new Ray(cameraCenter, rayDirection);
-
-                ColorVector pixelColor = getRayColor(ray, world);
-                Color currentColor = ColorVector.generateColor(pixelColor);
+                for (int sample = 0; sample < this.samplesPerPixel; sample++){
+                    Ray r = this.getRay(i,j);
+                    pixelColor = pixelColor.addVector(this.getRayColor(r,world));
+                }
+                
+                //ColorVector pixelColor = getRayColor(ray, world);
+                Color currentColor = ColorVector.generateColor(pixelColor,samplesPerPixel);
 
                 pixelWriter.setColor(i, j, currentColor);
             }
 
         }
     }
+
+    private Ray getRay(int i, int j) {
+        // Get a randomly sampled camera ray for the pixel at location i,j.
+        Vector3D deltaULocation = pixelDeltaU.multiplyVectorByScalar(i);
+        Vector3D deltaVLocation = pixelDeltaV.multiplyVectorByScalar(j);
+        Vector3D pixelCenter = originLocation.addVector(deltaULocation).addVector(deltaVLocation);
+
+        Vector3D pixelSample = pixelCenter.addVector(this.pixelSampleSquare());
+        Vector3D rayOrigin = cameraCenter;
+        Vector3D rayDirection = pixelSample.substractVector(rayOrigin);
+        return new Ray(rayOrigin, rayDirection);
+
+    }
+
+    private Vector3D pixelSampleSquare() {
+        double px = -0.5 + UtilitiesFunctions.getRandomDouble();
+        double py = -0.5 + UtilitiesFunctions.getRandomDouble();
+
+        Vector3D deltaUValue = pixelDeltaU.multiplyVectorByScalar(px);
+        Vector3D deltaVValue = pixelDeltaV.multiplyVectorByScalar(py);
+        return deltaUValue.addVector(deltaVValue);
+    }
+
+
 
     public void initialize() {
         // Calculate the image height, and ensure that it's at least 1.
@@ -152,5 +174,14 @@ public class Camera {
     public void setCameraCenter(Vector3D cameraCenter) {
         this.cameraCenter = cameraCenter;
     }
+
+    public int getSamplesPerPixel() {
+        return samplesPerPixel;
+    }
+
+    public void setSamplesPerPixel(int samplesPerPixel) {
+        this.samplesPerPixel = samplesPerPixel;
+    }
+
     
 }

@@ -4,6 +4,8 @@ import javafx.scene.paint.Color;
 
 public class ColorVector extends Vector3D {
 
+    private static Interval intervalIntensity = new Interval(0, 0.999);
+
     public ColorVector(){
         super();
     }
@@ -24,13 +26,19 @@ public class ColorVector extends Vector3D {
         return getX();
     }
 
-    public static Color generateColor(ColorVector pixelColor) {
+    public static Color generateColor(ColorVector pixelColor, int samplesPerPixel) {
 
         double r = pixelColor.getR();
         double g = pixelColor.getG();
         double b = pixelColor.getB();
 
-        Color currentColor = new Color(r, g, b, 1);
+        double scale = 1.0D/samplesPerPixel;
+        r*=scale;
+        g*=scale;
+        b*=scale; 
+
+
+        Color currentColor = new Color(intervalIntensity.clamp(r), intervalIntensity.clamp(g), intervalIntensity.clamp(b), 1);
         return currentColor;
     }
 

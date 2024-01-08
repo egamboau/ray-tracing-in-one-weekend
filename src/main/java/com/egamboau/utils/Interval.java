@@ -26,6 +26,18 @@ public class Interval {
         return min < value && value < max;
     }
 
+    public double clamp(double value) {
+        if (value < min) {
+            return min;
+        }
+
+        if(value > max) {
+            return max;
+        }
+
+        return value;
+    }
+
     public double getMin() {
         return min;
     }
