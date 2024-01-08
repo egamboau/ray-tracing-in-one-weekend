@@ -7,8 +7,6 @@ import com.egamboau.utils.Interval;
 import com.egamboau.utils.Ray;
 import com.egamboau.utils.UtilitiesFunctions;
 import com.egamboau.utils.Vector3D;
-
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 
@@ -25,10 +23,8 @@ public class Camera {
 
     private Vector3D cameraCenter;
 
-    public void render(Hittable world, GraphicsContext gc) {
+    public void render(Hittable world, PixelWriter pixelWriter) {
         initialize();
-
-        PixelWriter pixelWriter = gc.getPixelWriter();
         for (int j = 0; j < imageHeigth; ++j) {
 
             System.err.println(String.format("\rScanlines remaining: %d", imageHeigth - j));
