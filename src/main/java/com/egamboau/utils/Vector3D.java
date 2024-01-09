@@ -101,4 +101,36 @@ public class Vector3D {
     public Vector3D getNegatedVector() {
         return new Vector3D(-getX(), -getY(), -getZ());
     }
-}
+
+    public static Vector3D getRandomVector() {
+        return new Vector3D(UtilitiesFunctions.getRandomDouble(), UtilitiesFunctions.getRandomDouble(), UtilitiesFunctions.getRandomDouble());
+    }
+
+    public static Vector3D getRandomVector(double min, double max) {
+        return new Vector3D(UtilitiesFunctions.getRandomDouble(min, max), UtilitiesFunctions.getRandomDouble(min, max), UtilitiesFunctions.getRandomDouble(min, max));
+    }
+
+    public static Vector3D getRandomVectorInUnitSphere() {
+        Vector3D result = null;
+        while (result == null) {
+            Vector3D p = Vector3D.getRandomVector(-1, 1);
+            if (p.getLengthSquared() < 1) {
+                result = p;
+            }
+        }
+        return result;
+    }
+
+    public static Vector3D getRandomUnitVector() {
+        return getRandomVectorInUnitSphere().getUnitVector();
+    }
+
+    public static Vector3D randomVectorOnHemisphere(Vector3D normal) {
+        Vector3D vectorOnUnitSphere = Vector3D.getRandomUnitVector();
+        if(vectorOnUnitSphere.dotProduct(normal) > 0.0) {
+            return vectorOnUnitSphere;
+        } else {
+            return vectorOnUnitSphere.getNegatedVector();
+        }
+    }
+} 

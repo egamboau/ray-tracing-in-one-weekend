@@ -34,6 +34,7 @@ public class App extends Application {
         camera.setAspectRatio(16.0/9.0);
         camera.setImageWidth(400);
         camera.setSamplesPerPixel(100);
+        camera.setMaxDepth(50);
 
         HittableList world = new HittableList();
         world.add(new Sphere(new Vector3D(0,0,-1), 0.5));
