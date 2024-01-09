@@ -26,6 +26,4 @@ public class Ray {
     public Vector3D movePointToPositionInRay(double newPosition) {
         return this.origin.addVector(direction.multiplyVectorByScalar(newPosition));
     }
-
-
 }

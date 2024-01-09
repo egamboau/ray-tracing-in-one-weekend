@@ -23,6 +23,10 @@ public class Camera {
 
     private Vector3D cameraCenter;
 
+    private int maxDepth = 10;
+
+    
+
     public void render(Hittable world, PixelWriter pixelWriter) {
         initialize();
         for (int j = 0; j < imageHeigth; ++j) {
@@ -33,7 +37,7 @@ public class Camera {
 
                 for (int sample = 0; sample < this.samplesPerPixel; sample++){
                     Ray r = this.getRay(i,j);
-                    pixelColor = pixelColor.addVector(this.getRayColor(r,world));
+                    pixelColor = pixelColor.addVector(this.getRayColor(r,world, this.maxDepth));
                 }
                 
                 //ColorVector pixelColor = getRayColor(ray, world);
@@ -99,12 +103,17 @@ public class Camera {
                 
     }
 
-    private ColorVector getRayColor(Ray ray, Hittable world) {
+    private ColorVector getRayColor(Ray ray, Hittable world, int depth) {
+
+        if (depth <= 0) {
+            return new ColorVector(0,0,0);
+        }
+
         HitRecord record = new HitRecord();
 
-        if (world.hit(ray, new Interval(0, Double.POSITIVE_INFINITY), record)) {
-            Vector3D result =(record.getNormal().addVector(new ColorVector(1,1,1))).multiplyVectorByScalar(0.5);
-            return new ColorVector(result.getX(), result.getY(), result.getZ());
+        if (world.hit(ray, new Interval(0.001, Double.POSITIVE_INFINITY), record)) {
+            Vector3D direction = record.getNormal().addVector(Vector3D.getRandomUnitVector());
+            return getRayColor(new Ray(record.getP(), direction), world, depth - 1 ).multiplyVectorByScalar(0.5);
         }
         
         Vector3D unitVector = ray.getDirection().getUnitVector();
@@ -183,5 +192,12 @@ public class Camera {
         this.samplesPerPixel = samplesPerPixel;
     }
 
+    public int getMaxDepth() {
+        return maxDepth;
+    }
+
+    public void setMaxDepth(int max_depth) {
+        this.maxDepth = max_depth;
+    }
     
 }

@@ -26,6 +26,10 @@ public class ColorVector extends Vector3D {
         return getX();
     }
 
+    private static double linearToGamma(double linearComponent) {
+        return Math.sqrt(linearComponent);
+    }
+
     public static Color generateColor(ColorVector pixelColor, int samplesPerPixel) {
 
         double r = pixelColor.getR();
@@ -35,9 +39,13 @@ public class ColorVector extends Vector3D {
         double scale = 1.0D/samplesPerPixel;
         r*=scale;
         g*=scale;
-        b*=scale; 
+        b*=scale;
 
+        r = linearToGamma(r);
+        g = linearToGamma(g);
+        b = linearToGamma(b);
 
+    
         Color currentColor = new Color(intervalIntensity.clamp(r), intervalIntensity.clamp(g), intervalIntensity.clamp(b), 1);
         return currentColor;
     }
