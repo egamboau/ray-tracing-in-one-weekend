@@ -1,5 +1,7 @@
 package com.egamboau.utils;
 
+import java.util.Arrays;
+
 public class Vector3D {
 
     private double[] vector;
@@ -93,9 +95,16 @@ public class Vector3D {
         return this.divideVectorByScalar(this.getLength());
     }
 
+    public boolean isNearZero() {
+        double s = 1e-18;
+        return (Math.abs(getX()) < s) && (Math.abs(getY()) < s) && (Math.abs(getZ()) < s);
+    }
+
+    
+
     @Override
     public String toString() {
-        return String.format("%f %f %f", this.vector[0], this.vector[1], this.vector[2]);
+        return "Vector3D [vector=" + Arrays.toString(vector) + "]";
     }
 
     public Vector3D getNegatedVector() {
@@ -121,6 +130,13 @@ public class Vector3D {
         return result;
     }
 
+    public static Vector3D reflect(Vector3D v, Vector3D n) {
+        double bLength = v.dotProduct(n);
+        Vector3D b = n.multiplyVectorByScalar(bLength);
+        Vector3D bTimes2 = b.multiplyVectorByScalar(2);
+        return v.substractVector(bTimes2);
+    }
+
     public static Vector3D getRandomUnitVector() {
         return getRandomVectorInUnitSphere().getUnitVector();
     }
@@ -133,4 +149,7 @@ public class Vector3D {
             return vectorOnUnitSphere.getNegatedVector();
         }
     }
+
+
+    
 } 

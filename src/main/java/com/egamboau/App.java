@@ -3,6 +3,10 @@ package com.egamboau;
 import com.egamboau.objects.HittableList;
 import com.egamboau.objects.Sphere;
 import com.egamboau.redering.Camera;
+import com.egamboau.redering.Material;
+import com.egamboau.redering.materials.Lambertian;
+import com.egamboau.redering.materials.Metal;
+import com.egamboau.utils.ColorVector;
 import com.egamboau.utils.Interval;
 import com.egamboau.utils.Vector3D;
 
@@ -37,8 +41,15 @@ public class App extends Application {
         camera.setMaxDepth(50);
 
         HittableList world = new HittableList();
-        world.add(new Sphere(new Vector3D(0,0,-1), 0.5));
-        world.add(new Sphere(new Vector3D(0,-100.5,-1), 100));
+        Material materialGround = new Lambertian(new ColorVector(0.8, 0.8, 0.0));
+        Material materialCenter = new Lambertian(new ColorVector(0.7, 0.3, 0.3));
+        Material materialLeft   = new Metal(new ColorVector(0.8, 0.8, 0.8), 0.3);
+        Material materialRight  = new Metal(new ColorVector(0.8, 0.6, 0.2), 1.0);
+
+        world.add(new Sphere(new Vector3D( 0.0, -100.5, -1.0), 100.0, materialGround));
+        world.add(new Sphere(new Vector3D( 0.0,    0.0, -1.0),   0.5, materialCenter));
+        world.add(new Sphere(new Vector3D(-1.0,    0.0, -1.0),   0.5, materialLeft));
+        world.add(new Sphere(new Vector3D( 1.0,    0.0, -1.0),   0.5, materialRight));
 
         primaryStage.setTitle("Ray Tracing in a Weekend");
         Group root = new Group();

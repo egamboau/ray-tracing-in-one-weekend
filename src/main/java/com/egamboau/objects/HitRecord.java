@@ -1,5 +1,6 @@
 package com.egamboau.objects;
 
+import com.egamboau.redering.Material;
 import com.egamboau.utils.Ray;
 import com.egamboau.utils.Vector3D;
 
@@ -8,9 +9,16 @@ public class HitRecord {
     private Vector3D p;
     private Vector3D normal;
     private double t;
-    boolean frontFace;
+    private boolean frontFace;
+    private Material material;
 
 
+    public Material getMaterial() {
+        return material;
+    }
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
     public boolean isFrontFace() {
         return frontFace;
     }

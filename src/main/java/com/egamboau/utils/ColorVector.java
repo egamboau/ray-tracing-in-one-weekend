@@ -64,4 +64,9 @@ public class ColorVector extends Vector3D {
         Vector3D operationResult = super.addVector(other);
         return this.convert3dVectorToColorVector(operationResult);
     }
+
+    public ColorVector multiplyVectorByVector(ColorVector other) {
+        Vector3D operationResult = super.multiplyVectorByVector(other);
+        return this.convert3dVectorToColorVector(operationResult);
+    }
 }
