@@ -2,6 +2,7 @@ package com.egamboau.redering;
 
 import com.egamboau.objects.HitRecord;
 import com.egamboau.objects.Hittable;
+import com.egamboau.redering.Material.ScatterData;
 import com.egamboau.utils.ColorVector;
 import com.egamboau.utils.Interval;
 import com.egamboau.utils.Ray;
@@ -112,8 +113,13 @@ public class Camera {
         HitRecord record = new HitRecord();
 
         if (world.hit(ray, new Interval(0.001, Double.POSITIVE_INFINITY), record)) {
-            Vector3D direction = record.getNormal().addVector(Vector3D.getRandomUnitVector());
-            return getRayColor(new Ray(record.getP(), direction), world, depth - 1 ).multiplyVectorByScalar(0.5);
+
+            ScatterData scatterData = record.getMaterial().scatter(ray, record);
+            if(scatterData.isScattered()) {
+                return scatterData.getAlbedo().multiplyVectorByVector(getRayColor(scatterData.getScatteredRay(), world, depth-1));
+            } else {
+                return new ColorVector(0,0,0);
+            }
         }
         
         Vector3D unitVector = ray.getDirection().getUnitVector();

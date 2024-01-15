@@ -1,5 +1,6 @@
 package com.egamboau.objects;
 
+import com.egamboau.redering.Material;
 import com.egamboau.utils.Interval;
 import com.egamboau.utils.Ray;
 import com.egamboau.utils.Vector3D;
@@ -8,10 +9,12 @@ public class Sphere extends Hittable{
 
     private Vector3D center;
     private double radius;
+    private Material material;
 
-    public Sphere(Vector3D center, double radius) {
+    public Sphere(Vector3D center, double radius, Material material) {
         this.center = center;
         this.radius = radius;
+        this.material = material;
     }
 
     @Override
@@ -41,9 +44,15 @@ public class Sphere extends Hittable{
 
         Vector3D outwardNormal = (record.getP().substractVector(center)).divideVectorByScalar(radius);
         record.setFaceNormal(ray, outwardNormal);
-        
-
+        record.setMaterial(this.material);
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "Sphere [center=" + center + ", radius=" + radius + ", material=" + material + "]";
+    }
+    
+
     
 }

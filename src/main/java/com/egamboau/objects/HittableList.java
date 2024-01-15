@@ -41,7 +41,7 @@ public class HittableList extends Hittable{
                 record.setNormal(temporal.getNormal());
                 record.setP(temporal.getP());
                 record.setT(temporal.getT());
-                record = temporal;
+                record.setMaterial(temporal.getMaterial());
             }
         }
         
