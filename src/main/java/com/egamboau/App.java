@@ -44,12 +44,14 @@ public class App extends Application {
         HittableList world = new HittableList();
         Material materialGround = new Lambertian(new ColorVector(0.8, 0.8, 0.0));
         Material materialCenter = new Lambertian(new ColorVector(0.1,0.2,0.5));
-        Material materialLeft   = new Dielectric(1.00 / 1.33    );
+        Material materialBubble = new Dielectric(1.00 / 1.50);
         Material materialRight  = new Metal(new ColorVector(0.8, 0.6, 0.2), 0.0);
 
         world.add(new Sphere(new Vector3D( 0.0, -100.5, -1.0), 100.0, materialGround));
         world.add(new Sphere(new Vector3D( 0.0,    0.0, -1.0),   0.5, materialCenter));
-        world.add(new Sphere(new Vector3D(-1.0,    0.0, -1.0),   0.5, materialLeft));
+        //world.add(new Sphere(new Vector3D(-1.0,    0.0, -1.0),   0.5, materialLeft));
+        world.add(new Sphere(new Vector3D(-1.0,    0.0, -1.0),   0.5, materialBubble));
+
         world.add(new Sphere(new Vector3D( 1.0,    0.0, -1.0),   0.5, materialRight));
 
         primaryStage.setTitle("Ray Tracing in a Weekend");
