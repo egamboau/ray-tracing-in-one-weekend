@@ -8,6 +8,7 @@ import com.egamboau.utils.Interval;
 import com.egamboau.utils.Ray;
 import com.egamboau.utils.UtilitiesFunctions;
 import com.egamboau.utils.Vector3D;
+
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 
@@ -18,6 +19,15 @@ public class Camera {
     private int samplesPerPixel = 10;
     private int imageHeigth;
 
+    private double vfov = 90;
+
+    private Vector3D lookfrom = new Vector3D(0,0,0);   // Point camera is looking from
+    private Vector3D lookat = new Vector3D(0,0,-1);  // Point camera is looking at
+    private Vector3D vup = new Vector3D(0,1,0);     // Camera-relative "up" direction
+
+
+    
+
     private Vector3D originLocation;
     private Vector3D pixelDeltaU;
     private Vector3D pixelDeltaV;
@@ -25,6 +35,9 @@ public class Camera {
     private Vector3D cameraCenter;
 
     private int maxDepth = 10;
+    private Vector3D w;
+    private Vector3D u;
+    private Vector3D v;
 
     
 
@@ -79,16 +92,24 @@ public class Camera {
         imageHeigth = (int) (imageWidth / aspectRatio);
         imageHeigth = (imageHeigth < 1) ? 1 : imageHeigth;
 
-        cameraCenter = new Vector3D(0, 0, 0);
+        cameraCenter = lookfrom;
+        
+        
 
         // Determine viewport dimensions.
         double focal_length = 1.0;
-        double viewportHeight = 2.0;
+        double theta = UtilitiesFunctions.degreesToRadians(vfov);
+        double h = Math.tan(theta/2);
+        double viewportHeight = 2 * h * focal_length;
         double viewportWidth = viewportHeight * ((double) imageWidth / imageHeigth);
 
+        w = lookfrom.substractVector(lookat).getUnitVector();
+        u = vup.crossProduct(w).getUnitVector();
+        v = w.crossProduct(u).getUnitVector();
+
         // Calculate the vectors across the horizontal and down the vertical viewport edges.
-        Vector3D viewport_u = new Vector3D(viewportWidth, 0, 0);
-        Vector3D viewport_v = new Vector3D(0, -viewportHeight, 0);
+        Vector3D viewport_u = u.multiplyVectorByScalar(viewportWidth);
+        Vector3D viewport_v = v.multiplyVectorByScalar(-viewportHeight);
 
         // Calculate the horizontal and vertical delta vectors from pixel to pixel.
         pixelDeltaU = viewport_u.divideVectorByScalar(imageWidth);
@@ -96,7 +117,7 @@ public class Camera {
 
         // Calculate the location of the upper left pixel.
         Vector3D viewportUpperLeft = cameraCenter
-                .substractVector(new Vector3D(0, 0, focal_length))
+                .substractVector(w.multiplyVectorByScalar(focal_length))
                 .substractVector(viewport_u.divideVectorByScalar(2))
                 .substractVector(viewport_v.divideVectorByScalar(2));
         Vector3D deltaAdition = pixelDeltaU.addVector(pixelDeltaV);
@@ -204,6 +225,23 @@ public class Camera {
 
     public void setMaxDepth(int max_depth) {
         this.maxDepth = max_depth;
+    }
+
+    public void setVfov(double vfov) {
+        this.vfov = vfov;
+    }
+
+
+    public void setLookfrom(Vector3D lookfrom) {
+        this.lookfrom = lookfrom;
+    }
+
+    public void setLookat(Vector3D lookat) {
+        this.lookat = lookat;
+    }
+
+    public void setVup(Vector3D vup) {
+        this.vup = vup;
     }
     
 }

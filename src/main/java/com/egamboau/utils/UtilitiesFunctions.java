@@ -6,7 +6,7 @@ public class UtilitiesFunctions {
 
     private static Random randomGenerator = new Random();
 
-    public static double degrees_to_radians(double degrees) {
+    public static double degreesToRadians(double degrees) {
         return degrees * Math.PI / 180.0;
     }
 
