@@ -1,7 +1,7 @@
-package com.egamboau.redering.materials;
+package com.egamboau.rendering.materials;
 
 import com.egamboau.objects.HitRecord;
-import com.egamboau.redering.Material;
+import com.egamboau.rendering.Material;
 import com.egamboau.utils.ColorVector;
 import com.egamboau.utils.Ray;
 import com.egamboau.utils.Vector3D;

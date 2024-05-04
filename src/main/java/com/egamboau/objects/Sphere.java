@@ -1,6 +1,6 @@
 package com.egamboau.objects;
 
-import com.egamboau.redering.Material;
+import com.egamboau.rendering.Material;
 import com.egamboau.utils.Interval;
 import com.egamboau.utils.Ray;
 import com.egamboau.utils.Vector3D;

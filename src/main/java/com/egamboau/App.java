@@ -2,10 +2,11 @@ package com.egamboau;
 
 import com.egamboau.objects.HittableList;
 import com.egamboau.objects.Sphere;
-import com.egamboau.redering.Camera;
-import com.egamboau.redering.Material;
-import com.egamboau.redering.materials.Lambertian;
-import com.egamboau.redering.materials.Metal;
+import com.egamboau.rendering.materials.Dielectric;
+import com.egamboau.rendering.materials.Lambertian;
+import com.egamboau.rendering.materials.Metal;
+import com.egamboau.rendering.Camera;
+import com.egamboau.rendering.Material;
 import com.egamboau.utils.ColorVector;
 import com.egamboau.utils.Interval;
 import com.egamboau.utils.Vector3D;
@@ -42,13 +43,15 @@ public class App extends Application {
 
         HittableList world = new HittableList();
         Material materialGround = new Lambertian(new ColorVector(0.8, 0.8, 0.0));
-        Material materialCenter = new Lambertian(new ColorVector(0.7, 0.3, 0.3));
-        Material materialLeft   = new Metal(new ColorVector(0.8, 0.8, 0.8), 0.3);
-        Material materialRight  = new Metal(new ColorVector(0.8, 0.6, 0.2), 1.0);
+        Material materialCenter = new Lambertian(new ColorVector(0.1,0.2,0.5));
+        Material materialBubble = new Dielectric(1.00 / 1.50);
+        Material materialRight  = new Metal(new ColorVector(0.8, 0.6, 0.2), 0.0);
 
         world.add(new Sphere(new Vector3D( 0.0, -100.5, -1.0), 100.0, materialGround));
         world.add(new Sphere(new Vector3D( 0.0,    0.0, -1.0),   0.5, materialCenter));
-        world.add(new Sphere(new Vector3D(-1.0,    0.0, -1.0),   0.5, materialLeft));
+        //world.add(new Sphere(new Vector3D(-1.0,    0.0, -1.0),   0.5, materialLeft));
+        world.add(new Sphere(new Vector3D(-1.0,    0.0, -1.0),   0.5, materialBubble));
+
         world.add(new Sphere(new Vector3D( 1.0,    0.0, -1.0),   0.5, materialRight));
 
         primaryStage.setTitle("Ray Tracing in a Weekend");
