@@ -1,8 +1,8 @@
-package com.egamboau.redering;
+package com.egamboau.rendering;
 
 import com.egamboau.objects.HitRecord;
 import com.egamboau.objects.Hittable;
-import com.egamboau.redering.Material.ScatterData;
+import com.egamboau.rendering.Material.ScatterData;
 import com.egamboau.utils.ColorVector;
 import com.egamboau.utils.Interval;
 import com.egamboau.utils.Ray;

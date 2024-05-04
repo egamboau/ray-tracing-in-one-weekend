@@ -1,4 +1,4 @@
-package com.egamboau.redering;
+package com.egamboau.rendering;
 
 import com.egamboau.objects.HitRecord;
 import com.egamboau.utils.ColorVector;

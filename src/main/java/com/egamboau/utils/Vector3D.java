@@ -150,6 +150,10 @@ public class Vector3D {
         }
     }
 
-
-    
+    public static Vector3D refract(Vector3D uv, Vector3D n, double etai_over_etat) {
+        double cos_theta = Math.min(uv.getNegatedVector().dotProduct(n), 1.0);
+        Vector3D r_out_perpendicular = (uv.addVector(n.multiplyVectorByScalar(cos_theta))).multiplyVectorByScalar(etai_over_etat);
+        Vector3D r_out_parallel = n.multiplyVectorByScalar(-Math.sqrt(Math.abs(1.0 - r_out_perpendicular.getLengthSquared())));
+        return r_out_perpendicular.addVector(r_out_parallel);
+    }
 } 
