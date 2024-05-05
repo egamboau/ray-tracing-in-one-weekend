@@ -1,5 +1,9 @@
 package com.egamboau.rendering;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.IntStream;
+
 import com.egamboau.objects.HitRecord;
 import com.egamboau.objects.Hittable;
 import com.egamboau.rendering.Material.ScatterData;
@@ -9,6 +13,7 @@ import com.egamboau.utils.Ray;
 import com.egamboau.utils.UtilitiesFunctions;
 import com.egamboau.utils.Vector3D;
 
+import javafx.application.Platform;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 
@@ -26,7 +31,9 @@ public class Camera {
     private Vector3D vup = new Vector3D(0,1,0);     // Camera-relative "up" direction
 
 
-    
+    private double defocusAngle = 0;
+    private double focusDist = 10;
+
 
     private Vector3D originLocation;
     private Vector3D pixelDeltaU;
@@ -38,30 +45,37 @@ public class Camera {
     private Vector3D w;
     private Vector3D u;
     private Vector3D v;
+    private Vector3D defocus_disk_u;
+    private Vector3D defocus_disk_v;
 
     
 
     public void render(Hittable world, PixelWriter pixelWriter) {
         initialize();
-        for (int j = 0; j < imageHeigth; ++j) {
+        ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        int imageHeigthDist = (imageHeigth)/10;
+        int imageWidthDist = (imageWidth)/10;
+        
+        IntStream.iterate(0, boundaryMinHeight -> boundaryMinHeight < imageHeigth, boundaryMinHeight -> boundaryMinHeight + imageHeigthDist).forEach(boundaryMinHeight ->  {
+            IntStream.iterate(0, boundaryMinWidth -> boundaryMinWidth < imageWidth, boundaryMinWidth -> boundaryMinWidth + imageWidthDist).forEach(boundaryMinWidth -> {
+                service.execute(() -> {
+                    IntStream.range(boundaryMinHeight, boundaryMinHeight + imageHeigthDist).filter(j -> j < imageHeigth).forEach(j -> {
+                        IntStream.range(boundaryMinWidth, boundaryMinWidth + imageWidthDist).filter(i -> i < imageWidth).forEach(i -> {
+                            System.err.println(String.format("\rworking pixel %d, %d", i, j));
+                            ColorVector pixelColor = new ColorVector(0,0,0);
+                            for (int sample = 0; sample < this.samplesPerPixel; sample++){
+                                Ray r = this.getRay(i,j);
+                                pixelColor = pixelColor.addVector(this.getRayColor(r,world, this.maxDepth));
+                            }
 
-            System.err.println(String.format("\rScanlines remaining: %d", imageHeigth - j));
-            for (int i = 0; i < imageWidth; ++i) {
-                ColorVector pixelColor = new ColorVector(0,0,0);
-
-                for (int sample = 0; sample < this.samplesPerPixel; sample++){
-                    Ray r = this.getRay(i,j);
-                    pixelColor = pixelColor.addVector(this.getRayColor(r,world, this.maxDepth));
-                }
-                
-                //ColorVector pixelColor = getRayColor(ray, world);
-                Color currentColor = ColorVector.generateColor(pixelColor,samplesPerPixel);
-
-                pixelWriter.setColor(i, j, currentColor);
-            }
-
-        }
-    }
+                            Color currentColor = ColorVector.generateColor(pixelColor,samplesPerPixel);
+                            Platform.runLater(()->pixelWriter.setColor(i,j,currentColor));
+                        });
+                    });
+                });
+        });
+    });
+}
 
     private Ray getRay(int i, int j) {
         // Get a randomly sampled camera ray for the pixel at location i,j.
@@ -70,10 +84,16 @@ public class Camera {
         Vector3D pixelCenter = originLocation.addVector(deltaULocation).addVector(deltaVLocation);
 
         Vector3D pixelSample = pixelCenter.addVector(this.pixelSampleSquare());
-        Vector3D rayOrigin = cameraCenter;
+        Vector3D rayOrigin = (defocusAngle <= 0) ? cameraCenter : defocusDiskSample();;
         Vector3D rayDirection = pixelSample.substractVector(rayOrigin);
         return new Ray(rayOrigin, rayDirection);
 
+    }
+
+    private Vector3D defocusDiskSample() {
+        // Returns a random point in the camera defocus disk.
+        Vector3D p = Vector3D.getRandomVectorInUnitDisk();
+        return cameraCenter.addVector(defocus_disk_u.multiplyVectorByScalar(p.getAt(0))).addVector(defocus_disk_v.multiplyVectorByScalar(p.getAt(1)));
     }
 
     private Vector3D pixelSampleSquare() {
@@ -96,11 +116,9 @@ public class Camera {
         
         
 
-        // Determine viewport dimensions.
-        double focal_length = 1.0;
         double theta = UtilitiesFunctions.degreesToRadians(vfov);
         double h = Math.tan(theta/2);
-        double viewportHeight = 2 * h * focal_length;
+        double viewportHeight = 2 * h * focusDist;
         double viewportWidth = viewportHeight * ((double) imageWidth / imageHeigth);
 
         w = lookfrom.substractVector(lookat).getUnitVector();
@@ -117,11 +135,15 @@ public class Camera {
 
         // Calculate the location of the upper left pixel.
         Vector3D viewportUpperLeft = cameraCenter
-                .substractVector(w.multiplyVectorByScalar(focal_length))
+                .substractVector(w.multiplyVectorByScalar(focusDist))
                 .substractVector(viewport_u.divideVectorByScalar(2))
                 .substractVector(viewport_v.divideVectorByScalar(2));
         Vector3D deltaAdition = pixelDeltaU.addVector(pixelDeltaV);
         originLocation = viewportUpperLeft.addVector(deltaAdition.multiplyVectorByScalar(0.5));
+
+        double defocus_radius = focusDist * Math.tan(UtilitiesFunctions.degreesToRadians(defocusAngle / 2));
+        defocus_disk_u = u.multiplyVectorByScalar(defocus_radius);
+        defocus_disk_v = v.multiplyVectorByScalar(defocus_radius);
                 
     }
 
@@ -243,5 +265,12 @@ public class Camera {
     public void setVup(Vector3D vup) {
         this.vup = vup;
     }
-    
+
+    public void setDefocusAngle(double defocusAngle) {
+        this.defocusAngle = defocusAngle;
+    }
+
+    public void setFocusDist(double focusDist) {
+        this.focusDist = focusDist;
+    }
 }
