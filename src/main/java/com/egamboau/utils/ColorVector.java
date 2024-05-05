@@ -50,23 +50,33 @@ public class ColorVector extends Vector3D {
         return currentColor;
     }
 
-    private ColorVector convert3dVectorToColorVector(Vector3D vector) {
+    private static ColorVector convert3dVectorToColorVector(Vector3D vector) {
         return new ColorVector(vector.getX(), vector.getY(), vector.getZ());
     }
 
 
     public ColorVector multiplyVectorByScalar(double scalar) {
         Vector3D operationResult = super.multiplyVectorByScalar(scalar);
-        return this.convert3dVectorToColorVector(operationResult);
+        return ColorVector.convert3dVectorToColorVector(operationResult);
     }
 
     public ColorVector addVector(ColorVector other) {
         Vector3D operationResult = super.addVector(other);
-        return this.convert3dVectorToColorVector(operationResult);
+        return ColorVector.convert3dVectorToColorVector(operationResult);
     }
 
     public ColorVector multiplyVectorByVector(ColorVector other) {
         Vector3D operationResult = super.multiplyVectorByVector(other);
-        return this.convert3dVectorToColorVector(operationResult);
+        return ColorVector.convert3dVectorToColorVector(operationResult);
+    }
+
+    public static ColorVector getRandomColorVector(){
+        Vector3D operationResult = getRandomVector();
+        return convert3dVectorToColorVector(operationResult);
+    }
+
+    public static ColorVector getRandomColorVector(double min, double max){
+        Vector3D operationResult = getRandomVector(min, max);
+        return convert3dVectorToColorVector(operationResult);
     }
 }

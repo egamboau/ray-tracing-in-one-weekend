@@ -1,5 +1,7 @@
 package com.egamboau;
 
+import java.util.concurrent.ExecutionException;
+
 import com.egamboau.objects.HittableList;
 import com.egamboau.objects.Sphere;
 import com.egamboau.rendering.materials.Lambertian;
@@ -19,6 +21,7 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 /**
  * JavaFX App
@@ -31,7 +34,7 @@ public class CameraTestApp extends Application {
     double zoomScale = 0.1;
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws InterruptedException, ExecutionException {
 
         Camera camera = new Camera();
         camera.setAspectRatio(16.0/9.0);
@@ -157,10 +160,17 @@ public class CameraTestApp extends Application {
             }
             
         });
+
+        primaryStage.setOnShown(new EventHandler<WindowEvent>() {
+
+            @Override
+            public void handle(WindowEvent event) {
+                camera.render(world, pixelWriter);
+            }
+        });
+
         primaryStage.show();
 
-        
-        camera.render(world, pixelWriter);
     }
 
 

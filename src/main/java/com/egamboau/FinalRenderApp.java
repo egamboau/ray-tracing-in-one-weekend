@@ -11,6 +11,7 @@ import com.egamboau.rendering.Camera;
 import com.egamboau.rendering.Material;
 import com.egamboau.utils.ColorVector;
 import com.egamboau.utils.Interval;
+import com.egamboau.utils.UtilitiesFunctions;
 import com.egamboau.utils.Vector3D;
 
 import javafx.application.Application;
@@ -28,7 +29,7 @@ import javafx.stage.WindowEvent;
 /**
  * JavaFX App
  */
-public class App extends Application {
+public class FinalRenderApp extends Application {
 
     int gcScaleX = 1;
     int gcScaleY = 1;
@@ -40,30 +41,60 @@ public class App extends Application {
 
         Camera camera = new Camera();
         camera.setAspectRatio(16.0/9.0);
-        camera.setImageWidth(400);
-        camera.setSamplesPerPixel(100);
+        camera.setImageWidth(1200);
+        camera.setSamplesPerPixel(10);
         camera.setMaxDepth(50);
 
         camera.setVfov(20);
-        camera.setLookfrom(new Vector3D(-2,2,1));
-        camera.setLookat(new Vector3D(0,0,-1));
+        camera.setLookfrom(new Vector3D(13,2,3));
+        camera.setLookat(new Vector3D(0,0,0));
         camera.setVup(new Vector3D(0,1,0));
 
-        camera.setDefocusAngle(10.0);
-        camera.setFocusDist(3.4);
+        camera.setDefocusAngle(0.6);
+        camera.setFocusDist(10);
 
         HittableList world = new HittableList();
-        Material materialGround = new Lambertian(new ColorVector(0.8, 0.8, 0.0));
-        Material materialCenter = new Lambertian(new ColorVector(0.1,0.2,0.5));
-        Material materialBubble = new Dielectric(1.00 / 1.50);
-        Material materialRight  = new Metal(new ColorVector(0.8, 0.6, 0.2), 0.0);
+        Material materialGround = new Lambertian(new ColorVector(0.5, 0.5, 0.5));
+        world.add(new Sphere(new Vector3D( 0,-1000,0), 1000.0, materialGround));
 
-        world.add(new Sphere(new Vector3D( 0.0, -100.5, -1.0), 100.0, materialGround));
-        world.add(new Sphere(new Vector3D( 0.0,    0.0, -1.0),   0.5, materialCenter));
-        //world.add(new Sphere(new Vector3D(-1.0,    0.0, -1.0),   0.5, materialLeft));
-        world.add(new Sphere(new Vector3D(-1.0,    0.0, -1.0),   0.5, materialBubble));
+        for (int a = -11; a < 11; a++) {
+            for (int b = -11; b < 11; b++) {
+                double chooseMaterial = UtilitiesFunctions.getRandomDouble();
+                Vector3D center = new Vector3D(a + 0.9*UtilitiesFunctions.getRandomDouble(), 0.2, b + 0.9*UtilitiesFunctions.getRandomDouble());
 
-        world.add(new Sphere(new Vector3D( 1.0,    0.0, -1.0),   0.5, materialRight));
+                if (center.substractVector(new Vector3D(4, 0.2, 0)).getLength() > 0.9) {
+                    Material sphereMaterial = null;
+                    
+                    if (chooseMaterial < 0.8) {
+                        // diffuse
+                        ColorVector albedo = ColorVector.getRandomColorVector().multiplyVectorByVector(ColorVector.getRandomColorVector());
+                        sphereMaterial = new Lambertian(albedo);
+                        world.add(new Sphere(center, 0.2, sphereMaterial));
+                    } else if (chooseMaterial < 0.95) {
+                        // metal
+                        ColorVector albedo = ColorVector.getRandomColorVector(0.5, 1);
+                        double fuzz = UtilitiesFunctions.getRandomDouble(0,0.5);
+                        sphereMaterial = new Metal(albedo, fuzz);
+                        world.add(new Sphere(center, 0.2, sphereMaterial));
+                    } else {
+                        // glass
+                        sphereMaterial = new Dielectric(1.5);
+                        world.add(new Sphere(center, 0.2, sphereMaterial));
+                    }
+
+                }
+            }
+        }
+
+        Material material1 = new Dielectric(1.5);
+        world.add(new Sphere(new Vector3D(0, 1, 0), 1.0, material1));
+
+        Material material2 = new Lambertian(new ColorVector(0.4, 0.2, 0.1));
+        world.add(new Sphere(new Vector3D(-4, 1, 0), 1.0, material2));
+
+        Material material3 = new Metal(new ColorVector(0.7, 0.6, 0.5), 0.0);
+        world.add(new Sphere(new Vector3D(4, 1, 0), 1.0, material3));
+
 
         primaryStage.setTitle("Ray Tracing in a Weekend");
         Group root = new Group();
@@ -169,6 +200,7 @@ public class App extends Application {
             }
             
         });
+        
         primaryStage.setOnShown(new EventHandler<WindowEvent>() {
 
             @Override

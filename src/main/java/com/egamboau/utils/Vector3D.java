@@ -130,6 +130,14 @@ public class Vector3D {
         return result;
     }
 
+    public static Vector3D getRandomVectorInUnitDisk() {
+        while (true) {
+            Vector3D p = new Vector3D(UtilitiesFunctions.getRandomDouble(-1,1), UtilitiesFunctions.getRandomDouble(-1,1), 0.0);
+            if (p.getLengthSquared() < 1)
+                return p;
+        }
+    }
+
     public static Vector3D reflect(Vector3D v, Vector3D n) {
         double bLength = v.dotProduct(n);
         Vector3D b = n.multiplyVectorByScalar(bLength);
